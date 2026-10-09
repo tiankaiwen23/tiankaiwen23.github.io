@@ -1,0 +1,109 @@
+---
+// Dot-matrix world map of visitors. Land dots render client-side from
+// WORLD_MASK; visit dots come from SITE.visitorApi (Cloudflare Worker),
+// or from a small sample set in dev so the design is previewable.
+import { SITE } from "../data/site";
+
+const show = import.meta.env.DEV || SITE.visitorApi;
+---
+
+{
+  show && (
+    <section class="section visitors-section" aria-labelledby="visitors-title">
+      <h2 class="section-title" id="visitors-title">
+        Visitors
+        <span class="visitors-stats" id="visitors-stats" />
+      </h2>
+      <svg
+        id="visitor-map"
+        viewBox="0 0 180 90"
+        role="img"
+        aria-label="World map of visitor locations"
+        preserveAspectRatio="xMidYMid meet"
+      />
+    </section>
+  )
+}
+
+<script>
+  import { WORLD_MASK, WORLD_MASK_W, WORLD_MASK_H } from "../data/worldmask";
+  import { COUNTRY_CENTROIDS } from "../data/geo";
+  import { SITE } from "../data/site";
+
+  const SAMPLE: Record<string, number> = {
+    CN: 128,
+    US: 64,
+    HK: 32,
+    JP: 18,
+    DE: 9,
+    GB: 7,
+    SG: 5,
+    KR: 4,
+  };
+
+  const NS = "http://www.w3.org/2000/svg";
+
+  function dot(svg: Element, x: number, y: number, r: number, cls: string) {
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", String(x));
+    c.setAttribute("cy", String(y));
+    c.setAttribute("r", String(r));
+    c.setAttribute("class", cls);
+    svg.appendChild(c);
+  }
+
+  function renderMap(svg: Element) {
+    svg.textContent = "";
+    for (let row = 0; row < WORLD_MASK_H; row++) {
+      const line = WORLD_MASK[row];
+      for (let col = 0; col < WORLD_MASK_W; col++) {
+        if (line[col] === "1") dot(svg, col + 0.5, row + 0.5, 0.42, "vm-land");
+      }
+    }
+  }
+
+  function renderVisits(svg: Element, visits: Record<string, number>) {
+    let total = 0;
+    let countries = 0;
+    for (const [cc, n] of Object.entries(visits)) {
+      total += n;
+      countries++;
+      const c = COUNTRY_CENTROIDS[cc];
+      if (!c) continue;
+      const x = ((c[1] + 180) / 360) * WORLD_MASK_W;
+      const y = ((90 - c[0]) / 180) * WORLD_MASK_H;
+      dot(svg, x, y, 1.4, "vm-hit");
+    }
+    const stats = document.getElementById("visitors-stats");
+    if (stats) stats.textContent = `${total} visits · ${countries} countries`;
+  }
+
+  let beaconed = false; // one hit per session, even across swaps
+
+  async function initVisitorMap() {
+    const svg = document.getElementById("visitor-map");
+    if (!svg) return;
+    renderMap(svg);
+    // Keep local previews deterministic and never count developer refreshes.
+    const api = import.meta.env.DEV ? "" : SITE.visitorApi;
+    if (!api) {
+      renderVisits(svg, SAMPLE); // local preview only
+      return;
+    }
+    try {
+      if (!beaconed) {
+        beaconed = true;
+        navigator.sendBeacon?.(`${api}/hit`);
+      }
+      const res = await fetch(`${api}/visits`);
+      const visits = await res.json();
+      renderVisits(svg, visits);
+    } catch {
+      svg.closest(".visitors-section")?.classList.add("visitors-offline");
+    }
+  }
+
+  // run now and after every client-side swap back to the home page
+  initVisitorMap();
+  document.addEventListener("astro:page-load", initVisitorMap);
+</script>

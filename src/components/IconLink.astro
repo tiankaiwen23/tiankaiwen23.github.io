@@ -1,0 +1,49 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  icon: string;
+}
+
+const { href, label, icon } = Astro.props;
+
+// Compact line icons; the visible label keeps less-standard marks unambiguous.
+const ICONS: Record<string, string> = {
+  email:
+    '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>',
+  github:
+    '<path fill="currentColor" stroke="none" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2.2c-3.22.7-3.9-1.37-3.9-1.37-.53-1.35-1.29-1.71-1.29-1.71-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.76 2.7 1.25 3.36.95.1-.75.4-1.25.73-1.54-2.57-.29-5.27-1.29-5.27-5.73 0-1.27.45-2.3 1.2-3.12-.12-.3-.52-1.47.11-3.07 0 0 .98-.31 3.17 1.19a10.98 10.98 0 0 1 5.77 0c2.2-1.5 3.17-1.19 3.17-1.19.63 1.6.23 2.77.11 3.07.75.82 1.2 1.85 1.2 3.12 0 4.45-2.71 5.44-5.29 5.72.42.36.78 1.08.78 2.18v3.23c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/>',
+  note: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+};
+
+const body = ICONS[icon] ?? "";
+---
+
+<a
+  href={href}
+  class="link-icon"
+  aria-label={label}
+  title={label}
+  target={href.startsWith("http") ? "_blank" : undefined}
+  rel={href.startsWith("http") ? "noreferrer" : undefined}
+>
+  <span class:list={["link-mark", `link-mark-${icon}`]} aria-hidden="true">
+    {icon === "note" ? (
+      <img class="link-mark-image" src="/brands/xiaohongshu.svg" alt="" />
+    ) : icon === "doc" ? (
+      <span class="cv-mark"></span>
+    ) : (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        set:html={body}
+      />
+    )}
+  </span>
+  <span class="link-label">{label}</span>
+</a>

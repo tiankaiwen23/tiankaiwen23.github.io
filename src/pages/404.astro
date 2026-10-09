@@ -1,0 +1,17 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="404">
+  <div class="notfound">
+    <svg viewBox="0 0 100 100" role="img" aria-label="A cubist grid with one pane drifting away">
+      <polygon points="17.5,21.5 50.5,16.5 51.5,50 19.5,52.5" fill="none" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/>
+      <polygon class="pane-ghost" points="52.5,15.5 81.5,23.5 79.5,53 51.5,50" fill="none" stroke="var(--faint)" stroke-width="2.4" stroke-dasharray="3 4" stroke-linejoin="round"/>
+      <polygon class="pane-lost" points="52.5,15.5 81.5,23.5 79.5,53 51.5,50" fill="var(--accent)" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/>
+      <polygon points="19.5,54.5 51,52 47.5,84.5 16,79.5" fill="var(--ochre)" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/>
+      <polygon points="52,52 80,55 83,81.5 49,85.5" fill="none" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/>
+    </svg>
+    <h1>404 — A PANE BROKE AWAY</h1>
+    <p>This page drifted out of the grid. <a href="/">Back to base</a>.</p>
+  </div>
+</Base>

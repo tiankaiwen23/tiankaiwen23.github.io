@@ -1,0 +1,27 @@
+---
+import Base from "../layouts/Base.astro";
+import PubItem from "../components/PubItem.astro";
+import { PUBLICATIONS } from "../data/publications";
+
+const pubs = [...PUBLICATIONS].sort((a, b) => b.year - a.year);
+const years = [...new Set(pubs.map((pub) => pub.year))];
+---
+
+<Base title="Publications" description="Publications by Kaiwen Tian.">
+  <div class="page-head">
+    <h1>Publications</h1>
+  </div>
+
+  {pubs.length > 0 ? (
+    years.map((year) => (
+      <section class="section">
+        <h2 class="section-title">{year}</h2>
+        {pubs.filter((pub) => pub.year === year).map((pub) => <PubItem pub={pub} />)}
+      </section>
+    ))
+  ) : (
+    <section class="section">
+      <p class="empty-state">No publications yet.</p>
+    </section>
+  )}
+</Base>

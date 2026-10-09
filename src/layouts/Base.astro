@@ -1,0 +1,281 @@
+---
+import { SITE } from "../data/site";
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} — ${SITE.name}` : SITE.name;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
+const socialImage = new URL("/og.png", Astro.site ?? Astro.url);
+const current = Astro.url.pathname;
+const nav = [
+  { label: "Home", href: "/" },
+  { label: "Publications", href: "/publications" },
+  { label: "Blog", href: "/blog" },
+];
+const isActive = (href: string) =>
+  current === href || current.startsWith(href + "/");
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline>
+      // apply saved/system theme before first paint to avoid flashing
+      (() => {
+        const t =
+          localStorage.getItem("theme") ??
+          (matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        const el = document.documentElement;
+        el.dataset.theme = t;
+        el.classList.add("js");
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description ?? SITE.description} />
+    <meta name="theme-color" id="meta-theme" content="#fbfbf8" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description ?? SITE.description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:image" content={socialImage.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description ?? SITE.description} />
+    <meta name="twitter:image" content={socialImage.href} />
+    <link rel="canonical" href={canonical.href} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: SITE.name,
+        alternateName: SITE.nameZh,
+        affiliation: {
+          "@type": "CollegeOrUniversity",
+          name: "Tsinghua University",
+        },
+        sameAs: SITE.links
+          .filter((l) => l.url.startsWith("http"))
+          .map((l) => l.url),
+      })}
+    />
+    <link id="favicon" rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <ClientRouter />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <svg class="ambient" viewBox="0 0 400 400" aria-hidden="true">
+      <polygon points="60,40 300,70 330,310 90,280" fill="none" stroke="var(--text)" stroke-width="1.6" stroke-linejoin="round"/>
+      <polygon points="180,120 330,150 300,300 150,270" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/>
+      <polygon points="290,60 350,75 335,140 275,125" fill="var(--ochre)" stroke="none"/>
+    </svg>
+    <svg class="ambient ambient-left" viewBox="0 0 400 400" aria-hidden="true">
+      <polygon points="70,60 220,30 260,340 110,370" fill="none" stroke="var(--text)" stroke-width="1.6" stroke-linejoin="round"/>
+      <polygon points="230,180 320,200 305,265 215,245" fill="var(--accent)" stroke="none"/>
+      <polygon points="45,300 125,290 132,368 52,378" fill="none" stroke="var(--ochre)" stroke-width="1.6" stroke-linejoin="round"/>
+    </svg>
+    <div class="container">
+      <header class="site-header">
+        <div class="site-name">
+          <a href="/"><svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><polygon points="17.5,21.5 50.5,16.5 51.5,50 19.5,52.5" fill="none" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/><polygon points="52.5,15.5 81.5,23.5 79.5,53 51.5,50" fill="var(--accent)" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/><polygon points="19.5,54.5 51,52 47.5,84.5 16,79.5" fill="var(--ochre)" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/><polygon points="52,52 80,55 83,81.5 49,85.5" fill="none" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/></svg><span>{SITE.name}</span><span class="site-name-zh">{SITE.nameZh}</span></a>
+        </div>
+        <nav class="site-nav">
+          {
+            nav.map((item) => (
+              <a href={item.href} class={isActive(item.href) ? "active" : ""}>
+                {item.label}
+              </a>
+            ))
+          }
+          <button
+            class="theme-toggle"
+            id="theme-toggle"
+            aria-label="Toggle color theme"
+            title="Toggle theme"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <mask id="theme-moon-mask" maskUnits="userSpaceOnUse" x="-6" y="-6" width="36" height="36">
+                <rect x="-6" y="-6" width="36" height="36" fill="white" />
+                <circle class="moon-cutout" cx="30" cy="4" r="8.5" fill="black" />
+              </mask>
+              <circle class="sun-core" cx="12" cy="12" r="5.4" fill="currentColor" mask="url(#theme-moon-mask)" />
+              <g class="sun-rays" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+                <line x1="12" y1="2.2" x2="12" y2="4.4" />
+                <line x1="12" y1="19.6" x2="12" y2="21.8" />
+                <line x1="2.2" y1="12" x2="4.4" y2="12" />
+                <line x1="19.6" y1="12" x2="21.8" y2="12" />
+                <line x1="4.9" y1="4.9" x2="6.5" y2="6.5" />
+                <line x1="17.5" y1="17.5" x2="19.1" y2="19.1" />
+                <line x1="4.9" y1="19.1" x2="6.5" y2="17.5" />
+                <line x1="17.5" y1="6.5" x2="19.1" y2="4.9" />
+              </g>
+            </svg>
+          </button>
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      <footer class="site-footer">
+        <span>{SITE.footer} · Built with <a href="https://astro.build">Astro</a></span>
+        <span class="footer-right">
+          <span class="footer-updated">Last Updated: {SITE.updated}</span>
+          <span class="footer-mark" aria-hidden="true"><svg viewBox="0 0 100 100"><polygon points="24,13 42.5,16.5 43.2,38 23.7,57" fill="var(--accent)" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/><polygon points="23.7,57 43.2,38 44.5,87 23.5,85" fill="var(--text)" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/><polygon points="43.2,40 67,12 80,21 50,50" fill="var(--ochre)" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/><polygon points="45.5,55 75,84 63.5,90 43.5,63" fill="var(--accent)" fill-opacity="0.55" stroke="var(--text)" stroke-width="4.2" stroke-linejoin="round"/></svg></span>
+        </span>
+      </footer>
+
+      <button
+        class="to-top"
+        id="to-top"
+        aria-label="Back to top"
+        title="Back to top"
+      >
+        ↑
+      </button>
+    </div>
+
+    <script>
+      // keep favicon + theme-color in sync with the active theme
+      function syncChrome() {
+        const dark = document.documentElement.dataset.theme === "dark";
+        document
+          .getElementById("favicon")
+          ?.setAttribute("href", dark ? "/favicon-dark.png" : "/favicon.png");
+        document
+          .getElementById("meta-theme")
+          ?.setAttribute("content", dark ? "#131417" : "#fbfbf8");
+      }
+
+      // single source of truth for theme: localStorage.
+      // view-transition swaps strip <html> attributes (server HTML has none),
+      // so re-apply after every swap or the toggle desyncs from the page.
+      function syncDocumentState() {
+        const el = document.documentElement;
+        el.classList.add("js");
+        el.dataset.theme =
+          localStorage.getItem("theme") ??
+          (matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+      }
+
+      document.addEventListener("astro:after-swap", syncDocumentState);
+
+      // back-to-top: delegated once for the whole session (the button
+      // itself is recreated by each page swap)
+      const syncToTop = () =>
+        document
+          .getElementById("to-top")
+          ?.classList.toggle("show", scrollY > 560);
+      addEventListener("scroll", syncToTop, { passive: true });
+      document.addEventListener("astro:page-load", syncToTop);
+      document.addEventListener("click", (e) => {
+        if (e.target.closest("#to-top"))
+          scrollTo({
+            top: 0,
+            behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+              ? "auto"
+              : "smooth",
+          });
+      });
+
+      document.addEventListener("astro:page-load", () => {
+        syncChrome();
+
+        function applyTheme(next) {
+          document.documentElement.dataset.theme = next;
+          localStorage.setItem("theme", next);
+          syncChrome();
+        }
+
+        // theme toggle: gentle full-page crossfade via view transitions;
+        // instant swap when unsupported / reduced motion
+        document
+          .getElementById("theme-toggle")
+          ?.addEventListener("click", () => {
+            const el = document.documentElement;
+            const next = el.dataset.theme === "dark" ? "light" : "dark";
+            const reduced = matchMedia(
+              "(prefers-reduced-motion: reduce)",
+            ).matches;
+            if (!document.startViewTransition || reduced) {
+              applyTheme(next);
+              return;
+            }
+            el.classList.add("theme-anim");
+            const vt = document.startViewTransition(() => applyTheme(next));
+            const cleanup = () => el.classList.remove("theme-anim");
+            vt.finished.then(cleanup, cleanup);
+          });
+
+        // scroll-in reveal for sections; blocks already visible at load
+        // cascade in 55ms steps, below-fold ones reveal without delay
+        const io = new IntersectionObserver(
+          (entries) =>
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("revealed");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.05 },
+        );
+        let step = 0;
+        document.querySelectorAll(".section, .intro").forEach((el) => {
+          if (el.getBoundingClientRect().top < innerHeight) {
+            el.style.setProperty("--reveal-delay", `${step++ * 55}ms`);
+          }
+          io.observe(el);
+        });
+
+        // pub teaser lightbox: in-page zoom, no navigation
+        document.querySelectorAll("[data-lightbox]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const img = btn.querySelector("img");
+            if (!img) return;
+            const overlay = document.createElement("div");
+            overlay.className = "lightbox";
+            overlay.setAttribute("role", "dialog");
+            overlay.setAttribute("aria-label", img.alt);
+            const big = document.createElement("img");
+            big.src = img.currentSrc || img.src;
+            big.alt = img.alt;
+            overlay.appendChild(big);
+            document.body.appendChild(overlay);
+            document.body.style.overflow = "hidden";
+            requestAnimationFrame(() => overlay.classList.add("open"));
+            const onKey = (e) => {
+              if (e.key === "Escape") close();
+            };
+            const close = () => {
+              document.removeEventListener("keydown", onKey);
+              overlay.classList.remove("open");
+              document.body.style.overflow = "";
+              setTimeout(() => overlay.remove(), 200);
+            };
+            overlay.addEventListener("click", close);
+            document.addEventListener("keydown", onKey);
+          });
+        });
+      });
+
+      // never leak a lightbox across page navigations
+      document.addEventListener("astro:before-swap", () => {
+        document.querySelector(".lightbox")?.remove();
+        document.body.style.overflow = "";
+      });
+    </script>
+  </body>
+</html>

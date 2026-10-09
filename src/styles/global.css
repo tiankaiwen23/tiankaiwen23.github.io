@@ -1,0 +1,1545 @@
+/* ─────────────────────────────────────────────
+   Kaiwen Tian — Homepage
+   Design: minimal researcher homepage,
+   pixel identity kept to a few fixed elements.
+   ───────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfbF8;
+  --text: #1b1c1e;
+  --muted: #62686f;
+  --faint: #6c737d;
+  --accent: #2b4a7f;
+  --accent-hover: #1e3560;
+  --accent-soft: rgba(43, 74, 127, 0.07);
+  --link: #1e56b0;
+  --link-hover: #173f80;
+  --line: #e8e6e0;
+  --ochre: #b2844a;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+    Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --serif: Charter, "Bitstream Charter", "Iowan Old Style", Palatino,
+    "Palatino Linotype", "Source Serif Pro", Georgia, "Songti SC", serif;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #131417;
+  --text: #e5e6e9;
+  --muted: #9aa0a8;
+  --faint: #7b828c;
+  --accent: #9ab8e8;
+  --accent-hover: #c0d5f2;
+  --accent-soft: rgba(154, 184, 232, 0.1);
+  --link: #b7c9f2;
+  --link-hover: #d8e3fb;
+  --line: #282a2f;
+  --ochre: #deb26a;
+  color-scheme: dark;
+}
+
+/* no-JS fallback: follow the system theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131417;
+    --text: #e5e6e9;
+    --muted: #9aa0a8;
+    --faint: #7b828c;
+    --accent: #9ab8e8;
+    --accent-hover: #c0d5f2;
+    --accent-soft: rgba(154, 184, 232, 0.1);
+    --link: #b7c9f2;
+    --link-hover: #d8e3fb;
+    --line: #282a2f;
+    --ochre: #deb26a;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: break-word;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.container {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* themed scrollbar: quiet track, hairline thumb that wakes on hover */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border: 2.5px solid var(--bg);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* typographic hygiene: no unbalanced headings, no orphan words */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── links ────────────────────────────────── */
+
+/* links get their own blue, brighter than the decorative accent,
+   plus a quiet underline at rest: "blue + underline = clickable" */
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+main a {
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(
+      color-mix(in srgb, currentColor 42%, transparent),
+      color-mix(in srgb, currentColor 42%, transparent)
+    );
+  background-size: 0% 1px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%, 0 100%;
+  padding-bottom: 1px;
+  transition:
+    color 0.15s ease,
+    background-size 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* hover: the solid line sweeps in from the left over the quiet base */
+main a:hover {
+  color: var(--link-hover);
+  background-size: 100% 1px, 100% 1px;
+}
+
+/* external-link arrow on mono link rows */
+.item-links a[href^="http"]::after {
+  content: "↗";
+  font-size: 0.72em;
+  margin-left: 0.18em;
+  vertical-align: 0.08em;
+  opacity: 0.75;
+}
+
+/* ── header / nav ─────────────────────────── */
+
+.site-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 2.75rem;
+  padding-bottom: 2.25rem;
+}
+
+.site-name {
+  font-weight: 650;
+  font-size: 1.18rem;
+  letter-spacing: 0.015em;
+}
+
+.site-name a {
+  color: var(--text);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+/* the cubiste 田 brand mark, same geometry as the favicon */
+.brand-mark {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+  margin-right: 0.55rem;
+  transform: translateY(0.06em) rotate(-3deg);
+}
+
+/* the name is also the way home — make it look clickable */
+.site-name a:hover {
+  color: var(--link);
+}
+
+.site-name-zh {
+  margin-left: 0.45rem;
+  color: var(--muted);
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", serif;
+  font-size: 0.9em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+/* A brief greeting, then a steady caret. */
+.site-name a::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.85em;
+  margin-left: 0.3em;
+  transform: translateY(0.1em);
+  background: var(--accent);
+  animation: caret-blink 1.4s steps(1) 2;
+}
+
+@keyframes caret-blink {
+  0%, 55%, 100% { opacity: 1; }
+  56%, 99% { opacity: 0; }
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.45rem;
+  font-size: 0.98rem;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+}
+
+.site-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 2px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.25s ease, color 0.15s ease;
+  padding-bottom: 4px;
+}
+
+.site-nav a:hover {
+  color: var(--text);
+  background-size: 100% 2px;
+}
+
+.site-nav a.active {
+  color: var(--accent);
+  background-size: 100% 2px;
+}
+
+/* ── typography ───────────────────────────── */
+
+h1,
+h2,
+h3 {
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* serif display layer: name, page titles, work titles */
+.site-name,
+.page-head h1,
+.article-header h1,
+.pub-title,
+.experience-company {
+  font-family: var(--serif);
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+/* emphasis: deliberate, not browser-default */
+strong,
+b {
+  font-weight: 650;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+/* ── sections ─────────────────────────────── */
+
+.section {
+  margin-top: 3.25rem;
+}
+
+.section-title {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+}
+
+/* cubist shard marker: a tilted quad split into accent + ochre facets,
+   with a soft offset plane cast behind it */
+.section-title::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  flex: none;
+  margin-right: 0.65rem;
+  background: linear-gradient(160deg, var(--accent) 52%, var(--ochre) 52%);
+  clip-path: polygon(22% 0, 100% 18%, 78% 100%, 0 82%);
+  transform: rotate(-7deg);
+  filter: drop-shadow(2.5px 2.5px 0 var(--accent-soft));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* shards gently swell when their section is hovered (no rotation) */
+.section:hover .section-title::before {
+  transform: rotate(-7deg) scale(1.18);
+}
+
+/* ── intro (home) ─────────────────────────── */
+
+.intro {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-top: 0.5rem;
+}
+
+.avatar-stack {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  flex: none;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--line), 0 4px 14px var(--accent-soft);
+  transform: rotate(-1.5deg);
+}
+
+/* cubist collage: two solid counter-tilted panes behind the photo,
+   same palette as the cubiste 田 favicon */
+.avatar-stack::before,
+.avatar-stack::after {
+  content: "";
+  position: absolute;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.avatar-stack::before {
+  inset: -5px;
+  background: var(--accent);
+  opacity: 0.85;
+  transform: rotate(-6deg);
+  z-index: -1;
+}
+
+.avatar-stack::after {
+  inset: -2px;
+  background: var(--ochre);
+  opacity: 0.8;
+  border-radius: 9px;
+  transform: rotate(4.5deg) translate(5px, 4px);
+  z-index: -2;
+}
+
+.intro-avatar {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+/* easter egg: hover cross-fades to the pixel version */
+.avatar-pixel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  image-rendering: pixelated;
+  transition: opacity 0.25s steps(6);
+}
+
+.avatar-stack:hover .avatar-pixel {
+  opacity: 1;
+}
+
+/* ── theme toggle ─────────────────────────── */
+
+.theme-toggle {
+  background: none;
+  border: none;
+  padding: 3px;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  border-radius: 4px;
+  color: var(--muted);
+  opacity: 0.75;
+  transition: opacity 0.15s ease, transform 0.25s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  opacity: 1;
+  color: var(--accent);
+  transform: scale(1.08);
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
+/* one icon, eclipsed: sun in light mode, crescent moon in dark —
+   the icon shows the theme you're IN, not the one you're going to */
+.theme-toggle .sun-core {
+  transition: r 0.4s cubic-bezier(0.6, 0, 0.3, 1.3);
+}
+
+.theme-toggle .moon-cutout {
+  transition: cx 0.45s cubic-bezier(0.5, 0, 0.2, 1),
+    cy 0.45s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.theme-toggle .sun-rays {
+  transform-origin: 12px 12px;
+  transition: transform 0.45s cubic-bezier(0.5, 0, 0.2, 1),
+    opacity 0.3s ease;
+}
+
+/* hover play: rays wiggle in light, the eclipse wobbles in dark */
+.theme-toggle:hover .sun-rays {
+  transform: rotate(22deg);
+}
+
+:root[data-theme="dark"] .theme-toggle .sun-core {
+  r: 6.2;
+}
+
+:root[data-theme="dark"] .theme-toggle .moon-cutout {
+  cx: 17;
+  cy: 6.5;
+}
+
+:root[data-theme="dark"] .theme-toggle .sun-rays {
+  transform: rotate(100deg) scale(0.25);
+  opacity: 0;
+}
+
+:root[data-theme="dark"] .theme-toggle:hover .moon-cutout {
+  cx: 16.2;
+  cy: 7.2;
+}
+
+.intro p {
+  margin-bottom: 0.75rem;
+}
+
+/* ── scroll-in reveal (JS-gated) ──────────── */
+
+html.js .section,
+html.js .intro {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  /* first-screen blocks cascade in 55ms steps; set from JS */
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.js .section.revealed,
+html.js .intro.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+.intro-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.5rem;
+  align-items: center;
+  margin-top: 1.1rem;
+}
+
+.link-icon {
+  background-image: none;
+  padding-bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.48rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  transition: color 0.15s ease, transform 0.2s ease;
+}
+
+.link-icon:hover {
+  color: var(--link);
+  transform: translateY(-1px);
+}
+
+.link-mark {
+  width: 1.15rem;
+  height: 1.15rem;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.link-mark svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  display: block;
+}
+
+.link-mark-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.link-mark-note {
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border-radius: 0.3rem;
+  background: #ff2442;
+  overflow: hidden;
+}
+
+.link-mark-doc {
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.cv-mark {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.cv-mark::before {
+  content: "CV";
+  font-size: 0.57rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* ── shared item head (pub title row) ─────── */
+
+.research-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.item-links {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  display: flex;
+  gap: 0.9rem;
+}
+
+.item-links span.sep {
+  color: var(--faint);
+}
+
+/* ── news ─────────────────────────────────── */
+
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.news-list li {
+  display: flex;
+  gap: 1.1rem;
+  padding: 0.38rem 0.75rem;
+  margin: 0 -0.75rem;
+  border-radius: 6px;
+  font-size: 0.94rem;
+}
+
+.news-date {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--faint);
+  flex: none;
+  width: 4.6rem;
+  padding-top: 0.15rem;
+}
+
+/* ── writing list ─────────────────────────── */
+
+.writing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.writing-list li {
+  display: flex;
+  gap: 1.1rem;
+  align-items: baseline;
+  padding: 0.38rem 0.75rem;
+  margin: 0 -0.75rem;
+  border-radius: 6px;
+  transition: background 0.18s ease;
+}
+
+.writing-date {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--faint);
+  flex: none;
+  width: 4.6rem;
+}
+
+.writing-list a {
+  color: var(--text);
+  font-size: 0.94rem;
+}
+
+.writing-list a:hover {
+  color: var(--link);
+}
+
+.writing-cat {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: var(--accent-soft);
+  border-radius: 3px;
+  padding: 0.1rem 0.45rem;
+  flex: none;
+}
+
+/* ── publications ─────────────────────────── */
+
+.pub-item {
+  margin: 0 -0.75rem;
+  padding: 0.95rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.pub-item:last-child {
+  border-bottom: none;
+}
+
+.pub-title {
+  font-weight: 600;
+  font-size: 1.06rem;
+  letter-spacing: 0.005em;
+}
+
+.pub-authors {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0.15rem 0;
+}
+
+.pub-authors .me {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pub-corr {
+  font-size: 0.8rem;
+  color: var(--faint);
+  margin: 0 0 0.25rem;
+}
+
+.pub-venue {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0.1rem 0 0.6rem;
+}
+
+/* award highlight: own line as a trophy chip */
+.pub-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  margin: 0 0 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 0.16rem 0.55rem;
+}
+
+.pub-note::before {
+  content: "🏆";
+}
+
+/* teaser thumbnail (optional, via `image` in publications.ts) */
+.pub-item:has(.pub-thumb) {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.pub-thumb {
+  flex: none;
+  width: 172px;
+  margin-top: 0.2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  position: relative;
+}
+
+/* a straight accent frame slides in behind the teaser on hover,
+   echoing the avatar collage */
+.pub-thumb::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.pub-thumb:hover::after {
+  opacity: 0.55;
+  transform: scale(1);
+}
+
+.pub-thumb img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pub-thumb:hover img {
+  transform: scale(1.025);
+  box-shadow: 0 6px 18px var(--accent-soft);
+}
+
+.pub-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* in-page teaser zoom (opened by [data-lightbox]) */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: rgba(10, 11, 14, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: zoom-out;
+}
+
+.lightbox.open {
+  opacity: 1;
+}
+
+.lightbox img {
+  max-width: min(1100px, 100%);
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.965);
+  transition: transform 0.2s ease;
+}
+
+.lightbox.open img {
+  transform: none;
+}
+
+/* ── article (writing post) ───────────────── */
+
+.article-header {
+  margin: 1rem 0 2rem;
+}
+
+.article-header h1 {
+  font-size: clamp(1.5rem, 4.5vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: 0.005em;
+  margin-bottom: 0.4rem;
+}
+
+.article-meta {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--faint);
+}
+
+.prose {
+  font-size: 0.97rem;
+}
+
+.prose h2 {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 620;
+  letter-spacing: 0.005em;
+  margin: 2.2rem 0 0.8rem;
+}
+
+.prose h3 {
+  font-size: 1rem;
+  margin: 1.8rem 0 0.6rem;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.4rem;
+}
+
+.prose li::marker {
+  color: var(--accent);
+}
+
+.prose blockquote {
+  margin: 1.2rem 0;
+  padding: 0.1rem 0 0.1rem 1rem;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+}
+
+.prose code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--accent-soft);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+}
+
+.prose pre {
+  background: var(--accent-soft);
+  border-radius: 6px;
+  padding: 0.9rem 1.1rem;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2.2rem 0;
+}
+
+.prose img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+/* ── cv ───────────────────────────────────── */
+
+.cv-section {
+  margin-top: 2.4rem;
+}
+
+.cv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cv-list li {
+  display: flex;
+  gap: 1.1rem;
+  padding: 0.45rem 0;
+  font-size: 0.94rem;
+}
+
+.cv-when {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--faint);
+  flex: none;
+  width: 7.5rem;
+  padding-top: 0.15rem;
+}
+
+.cv-item-sub {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* ── section title with side link ─────────── */
+
+.section-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.6rem;
+}
+
+.section-title-row .section-title {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.section-link {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  flex: none;
+}
+
+.section-link:hover {
+  color: var(--link);
+}
+
+/* ── education & experience ───────────────── */
+
+.education-item,
+.experience-item {
+  margin: 0 -0.75rem;
+  padding: 0.85rem 0.75rem;
+  border-radius: 6px;
+}
+
+.education-item p,
+.experience-item p {
+  font-size: 0.92rem;
+  margin: 0.35rem 0 0;
+}
+
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.experience-item {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+}
+
+.experience-logo-wrap {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.experience-logo-dark {
+  background: #1b1c20;
+  border-color: #2a2c31;
+}
+
+.experience-logo {
+  max-width: 38px;
+  max-height: 38px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.experience-logo-wrap:hover .experience-logo {
+  transform: scale(1.06);
+}
+
+.experience-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.experience-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.experience-company {
+  font-size: 1.04rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+a.experience-company {
+  color: var(--text);
+}
+
+a.experience-company:hover {
+  color: var(--link);
+}
+
+.experience-role {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 0.1rem;
+}
+
+.experience-period {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--faint);
+  flex: none;
+}
+
+.experience-period .now {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.empty-state {
+  color: var(--faint);
+  font-size: 0.94rem;
+  font-style: italic;
+}
+
+/* ── visitor map (dot-matrix world) ───────── */
+
+.visitors-stats {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--faint);
+}
+
+#visitor-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.4rem;
+}
+
+#visitor-map .vm-land {
+  fill: var(--faint);
+  opacity: 0.42;
+}
+
+#visitor-map .vm-hit {
+  fill: var(--accent);
+  animation: vm-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes vm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.visitors-offline .visitors-stats::after {
+  content: "map offline";
+}
+
+/* ── footer ───────────────────────────────── */
+
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5rem;
+  padding-top: 1.6rem;
+  padding-bottom: 3rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--faint);
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-updated {
+  color: var(--faint);
+}
+
+/* footer mark: the cubist K (same geometry as the avatar) signing off
+   the page; swells a little on hover */
+.footer-mark svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* flex already centers it with the text; no offset hacks */
+.footer-mark {
+  display: inline-flex;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.footer-mark:hover {
+  transform: scale(1.15);
+}
+
+/* ambient cubist composition in the page margin, wide screens only */
+.ambient {
+  position: fixed;
+  right: -7vw;
+  top: 8vh;
+  width: min(30vw, 480px);
+  height: auto;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+  display: none;
+}
+
+:root[data-theme="dark"] .ambient {
+  opacity: 0.06;
+}
+
+/* left margin gets its own composition, bottom-anchored for diagonal
+   balance against the right one; slightly quieter so they don't compete */
+.ambient-left {
+  right: auto;
+  left: -7vw;
+  top: auto;
+  bottom: 9vh;
+  width: min(26vw, 420px);
+  opacity: 0.038;
+}
+
+:root[data-theme="dark"] .ambient-left {
+  opacity: 0.05;
+}
+
+@media (min-width: 1000px) {
+  .ambient {
+    display: block;
+  }
+}
+
+/* ── back to top ──────────────────────────── */
+
+.to-top {
+  position: fixed;
+  right: 1.4rem;
+  bottom: 1.4rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  translate: 0 6px;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    translate 0.25s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.to-top.show {
+  opacity: 0.9;
+  translate: 0 0;
+  pointer-events: auto;
+}
+
+.to-top:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── 404 ──────────────────────────────────── */
+
+.notfound {
+  text-align: center;
+  padding: 4rem 0 2rem;
+}
+
+.notfound svg {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 1.5rem;
+}
+
+/* the blue pane escaped the grid and floats just off its dashed slot */
+.notfound .pane-lost {
+  transform-origin: 66px 34px;
+  animation: pane-drift 4.2s ease-in-out infinite;
+}
+
+@keyframes pane-drift {
+  0%,
+  100% {
+    transform: translate(9px, -7px) rotate(14deg);
+  }
+  50% {
+    transform: translate(12px, -11px) rotate(19deg);
+  }
+}
+
+.notfound h1 {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.75rem;
+}
+
+.notfound p {
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+/* ── page heading (subpages) ──────────────── */
+
+.page-head {
+  margin: 0.5rem 0 0;
+}
+
+.page-head h1 {
+  font-size: clamp(1.6rem, 4.5vw, 1.85rem);
+  font-weight: 640;
+  letter-spacing: 0.01em;
+}
+
+.page-head .page-sub {
+  color: var(--muted);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.02rem;
+  margin-top: 0.55rem;
+  max-width: 34rem;
+}
+
+/* ── view transitions ─────────────────────── */
+
+/* page nav: a quiet crossfade — old page sinks out, new page fades in
+   with a barely-there upward settle. no lateral motion. */
+html::view-transition-old(root) {
+  animation: vt-page-out 0.32s ease both;
+}
+
+html::view-transition-new(root) {
+  animation: vt-page-in 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vt-page-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* theme change: a plain crossfade — positional reveals proved flaky
+   across Chrome versions, fading never is */
+html.theme-anim::view-transition-old(root) {
+  animation: vt-theme-out 0.42s ease both;
+  mix-blend-mode: normal;
+  z-index: 1;
+}
+
+html.theme-anim::view-transition-new(root) {
+  animation: vt-theme-in 0.42s ease both;
+  mix-blend-mode: normal;
+  z-index: 2;
+}
+
+@keyframes vt-theme-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vt-theme-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ── responsive ───────────────────────────── */
+
+@media (max-width: 700px) {
+  .site-header {
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-top: 2rem;
+  }
+
+  .site-nav {
+    gap: 0.55rem 1.05rem;
+    font-size: 0.94rem;
+    flex-wrap: wrap;
+  }
+
+  /* portrait: avatar centered above the intro text, full size */
+  .intro {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .avatar-stack {
+    align-self: center;
+  }
+
+  /* contact row becomes a centered icon dock: labels hidden so the
+     row scales gracefully as more links are added */
+  .intro-links {
+    justify-content: center;
+    gap: 1.3rem;
+    margin-top: 1.25rem;
+  }
+
+  .link-label {
+    display: none;
+  }
+
+  .link-mark {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  /* company / role / period stack vertically */
+  .experience-head {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  /* pub teaser stacks above the text */
+  .pub-item:has(.pub-thumb) {
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .pub-thumb {
+    width: 100%;
+    max-width: 340px;
+    margin-top: 0;
+  }
+
+  /* section header link drops to its own line */
+  .section-title-row {
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: flex-start;
+    padding-bottom: 0.45rem;
+  }
+
+  .experience-period {
+    padding-top: 0.05rem;
+  }
+
+  .education-item p,
+  .experience-item p {
+    margin-top: 0.5rem;
+  }
+
+  /* dates keep their own column — stacked dates read badly */
+  .news-list li,
+  .writing-list li {
+    gap: 0.85rem;
+    align-items: baseline;
+  }
+
+  .news-date,
+  .writing-date {
+    width: 4.1rem;
+    font-size: 0.78rem;
+  }
+
+  .cv-list li {
+    gap: 0.85rem;
+  }
+
+  .cv-when {
+    width: 5.4rem;
+    font-size: 0.76rem;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* ── reduced motion ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .site-name a::after {
+    animation: none;
+  }
+
+  html.js .section,
+  html.js .intro {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* page swaps happen without the slide */
+  html::view-transition-old(root),
+  html::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ── print (CV) ───────────────────────────── */
+
+@media print {
+  :root {
+    --bg: #ffffff;
+    --text: #000000;
+    --muted: #333333;
+    --faint: #555555;
+    --accent: #1e3560;
+    --accent-soft: transparent;
+    --link: #1e3560;
+    --line: #cccccc;
+  }
+
+  .site-nav,
+  .theme-toggle,
+  .site-footer .footer-mark,
+  .intro-links,
+  .pub-thumb,
+  .ambient,
+  .to-top {
+    display: none;
+  }
+
+  html.js .section,
+  html.js .intro {
+    opacity: 1;
+    transform: none;
+  }
+
+  .site-name a::after {
+    display: none;
+  }
+}

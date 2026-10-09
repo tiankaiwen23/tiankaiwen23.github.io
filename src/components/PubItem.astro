@@ -1,0 +1,73 @@
+---
+import type { Publication } from "../data/publications";
+
+interface Props {
+  pub: Publication;
+}
+
+const { pub } = Astro.props;
+---
+
+<div class="pub-item">
+  {
+    pub.image && (
+      <button
+        class="pub-thumb"
+        type="button"
+        data-lightbox
+        aria-label={`Enlarge teaser figure: ${pub.title}`}
+        title="Click to enlarge"
+      >
+        <img
+          src={pub.image}
+          alt={`${pub.title} — teaser figure`}
+          width="1200"
+          height="800"
+          loading="lazy"
+          decoding="async"
+        />
+      </button>
+    )
+  }
+  <div class="pub-body">
+    <div class="research-head">
+      <span class="pub-title">{pub.title}</span>
+    </div>
+    <p class="pub-authors">
+      {
+        pub.authors.map((a, i) => {
+          const corr = a.endsWith("†"); // † marks the corresponding author
+          const name = corr ? a.slice(0, -1) : a;
+          return (
+            <>
+              {i > 0 && ", "}
+              <span class={name === "Kaiwen Tian" ? "me" : ""}>
+                {name}
+                {corr && <sup>†</sup>}
+              </span>
+            </>
+          );
+        })
+      }
+    </p>
+    {
+      pub.authors.some((a) => a.endsWith("†")) && (
+        <p class="pub-corr">
+          <sup>†</sup>Corresponding author
+        </p>
+      )
+    }
+    <p class="pub-venue">{pub.venue}</p>
+    {pub.note && <span class="pub-note">{pub.note}</span>}
+    <div class="item-links">
+      {
+        pub.links.map((l, i) => (
+          <>
+            {i > 0 && <span class="sep">·</span>}
+            <a href={l.url} target="_blank" rel="noreferrer">{l.label}</a>
+          </>
+        ))
+      }
+    </div>
+  </div>
+</div>

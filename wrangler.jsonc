@@ -1,0 +1,11 @@
+{
+  "name": "visitor-map",
+  "main": "worker/visits.js",
+  "compatibility_date": "2026-10-09",
+  "kv_namespaces": [
+    {
+      "binding": "VISITS",
+      "id": "b1fe45af91b64afa9c900b81df02ec5f"
+    }
+  ]
+}
