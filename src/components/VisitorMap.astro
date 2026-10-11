@@ -95,7 +95,12 @@ const show = import.meta.env.DEV || SITE.visitorApi;
         beaconed = true;
         navigator.sendBeacon?.(`${api}/hit`);
       }
-      const res = await fetch(`${api}/visits`);
+      // workers.dev is flaky from some networks (e.g. mainland mobile);
+      // give up fast and show the offline state instead of hanging blank
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 4000);
+      const res = await fetch(`${api}/visits`, { signal: ctl.signal });
+      clearTimeout(timer);
       const visits = await res.json();
       renderVisits(svg, visits);
     } catch {
